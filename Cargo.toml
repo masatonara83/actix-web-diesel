@@ -1,0 +1,56 @@
+[package]
+name = "actix-web-diesel"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+#framework for Rust
+actix-web = { version = "4.3" }
+
+# Cross-Origin Resource Sharing (CORS) controls for Actix Web
+actix-cors = { version = "0.6.4" }
+
+# ORM
+diesel = { version = "2.1.0", features = ["r2d2", "postgres", "chrono", "uuid", "serde_json"] }
+
+# Create and decode JWTs in a strongly typed way.
+jsonwebtoken = { version = "8.3" }
+
+# A generic serialization/deserialization framework
+serde = { version = "1.0", features = ["derive"] }
+
+# A JSON serialization file format
+serde_json = { version = "1.0" }
+
+# A `dotenv` implementation for Rust
+dotenv = { version = "0.15" }
+
+# Date and time library for Rust
+chrono = { version = "0.4", features = ["serde"] }
+
+# A library to generate and parse UUIDs.
+# Compatible version is here: https://github.com/diesel-rs/diesel/blob/master/diesel/Cargo.toml#L26
+uuid = { version = "0.8", features = ["serde", "v4"] }
+
+# Easily hash and verify passwords using bcrypt
+bcrypt = { version = "0.14.0" }
+
+# A lightweight logging facade for Rust
+log = { version = "0.4.17" }
+
+# A logging implementation for `log` which is configured via an environment variable.
+env_logger = { version = "0.10.0" }
+
+# Flexible concrete Error type built on std::error::Error
+anyhow = { version = "1.0" }
+
+# derive(Error)
+thiserror = { version = "1.0" }
+
+# An implementation of futures and streams featuring zero allocations, composability, and itera…
+futures = { version = "0.3" }
+
+# Convert strings into any case
+convert_case = { version = "0.6.0" }

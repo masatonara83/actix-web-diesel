@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest
+    healthcheck:
+      test: pg_isready
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password_pass
+      POSTGRES_DB: actix-web-diesel
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
