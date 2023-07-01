@@ -5,10 +5,12 @@ extern crate diesel;
 #[macro_use]
 extern crate log;
 
+mod app;
 mod constants;
 mod error;
 mod middleware;
 mod routes;
+mod schema;
 mod utils;
 
 #[actix_web::main]
