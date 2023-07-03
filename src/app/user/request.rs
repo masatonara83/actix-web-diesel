@@ -1,3 +1,5 @@
+use crate::schema::users;
+use diesel::Insertable;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, Clone)]

@@ -1,7 +1,11 @@
 use actix_web::{http::StatusCode, HttpResponse};
-use diesel::r2d2::PoolError;
-use serde_json::Value as JsonValue;
+use bcrypt::BcryptError;
+use diesel::r2d2::{Error as R2D2Error, PoolError};
+use diesel::result::{DatabaseErrorKind, Error as DieselError};
+use jsonwebtoken::errors::{Error as JwtError, ErrorKind as JwtErrorKind};
+use serde_json::{json, Value as JsonValue};
 use thiserror::Error;
+use uuid::Error as UuidError;
 
 #[derive(Error, Debug)]
 pub enum AppError {
@@ -53,6 +57,59 @@ impl actix_web::error::ResponseError for AppError {
 
 impl From<PoolError> for AppError {
     fn from(_: PoolError) -> Self {
+        AppError::InternetServerError
+    }
+}
+
+impl From<BcryptError> for AppError {
+    fn from(_err: BcryptError) -> Self {
+        AppError::InternetServerError
+    }
+}
+
+impl From<JwtError> for AppError {
+    fn from(err: JwtError) -> Self {
+        match err.kind() {
+            JwtErrorKind::InvalidToken => AppError::Unauthorized(json!({
+                "error": "Token is invalid"
+            })),
+            JwtErrorKind::InvalidIssuer => AppError::Unauthorized(json!({
+                "error": "Issuer is invalid"
+            })),
+            _ => AppError::Unauthorized(json!({
+                "error": "An issue was found with the token provided"
+            })),
+        }
+    }
+}
+
+impl From<R2D2Error> for AppError {
+    fn from(_err: R2D2Error) -> Self {
+        AppError::InternetServerError
+    }
+}
+
+impl From<DieselError> for AppError {
+    fn from(err: DieselError) -> Self {
+        match err {
+            DieselError::DatabaseError(kind, info) => {
+                if let DatabaseErrorKind::UniqueViolation = kind {
+                    let message = info.details().unwrap_or_else(|| info.message()).to_string();
+                    AppError::UnprocessableEntity(json!({ "error": message }))
+                } else {
+                    AppError::InternetServerError
+                }
+            }
+            DieselError::NotFound => {
+                AppError::NotFound(json!({"error": "requested recode was not found"}))
+            }
+            _ => AppError::InternetServerError,
+        }
+    }
+}
+
+impl From<UuidError> for AppError {
+    fn from(_err: UuidError) -> Self {
         AppError::InternetServerError
     }
 }

@@ -1,13 +1,20 @@
-use actix_web::web;
+use actix_web::{web, HttpResponse};
 
 use crate::{middleware::state::AppState, utils::handler::ApiResponse};
 
-use super::request;
+use super::{model::User, request, response::UserResponse};
 
 pub async fn signup(
     state: web::Data<AppState>,
     form: web::Json<request::SignupForm>,
 ) -> ApiResponse {
     let conn = &mut state.conn()?;
-    
+    let (user, token) = User::create(
+        conn,
+        &form.user.username,
+        &form.user.email,
+        &form.user.password,
+    )?;
+    let res = UserResponse::from((user, token));
+    Ok(HttpResponse::Ok().json(res))
 }

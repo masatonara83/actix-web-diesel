@@ -1,6 +1,10 @@
-use crate::{error::AppError, schema::users};
+use crate::{
+    error::AppError,
+    schema::users,
+    utils::{hasher, token},
+};
 
-use chrono::NaiveDateTime;
+use chrono::{NaiveDateTime, Utc};
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -29,5 +33,32 @@ impl User {
         email: &'a str,
         password: &'a str,
     ) -> Result<(User, Token), AppError> {
+        let password_hash = hasher::hash_password(password)?;
+        let recode = SignupUser {
+            username,
+            email,
+            password: &password_hash,
+        };
+
+        let user = diesel::insert_into(users::table)
+            .values(&recode)
+            .get_result::<User>(conn)?;
+
+        let token = user.gerenate_token()?;
+        Ok((user, token))
     }
+
+    pub fn gerenate_token(&self) -> Result<String, AppError> {
+        let now = Utc::now().timestamp_nanos();
+        let token = token::encode(self.id, now)?;
+        Ok(token)
+    }
+}
+
+#[derive(Debug, Insertable, Deserialize)]
+#[diesel(table_name = users)]
+struct SignupUser<'a> {
+    username: &'a str,
+    email: &'a str,
+    password: &'a str,
 }
