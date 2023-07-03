@@ -1,8 +1,6 @@
-use crate::{
-    error::AppError,
-    schema::users,
-    utils::{hasher, token},
-};
+use crate::error::AppError;
+use crate::schema::users;
+use crate::utils::{hasher, token};
 
 use chrono::{NaiveDateTime, Utc};
 use diesel::prelude::*;
@@ -12,13 +10,13 @@ use uuid::Uuid;
 type Token = String;
 
 //User構造体
-#[derive(Debug, Identifiable, Queryable, Serialize, Deserialize, Clone)]
+#[derive(Identifiable, Queryable, Selectable, Serialize, Deserialize, Debug, Clone)]
 #[diesel(table_name = users)]
 pub struct User {
     pub id: Uuid,
     pub username: String,
     pub email: String,
-    pub password_hash: String,
+    pub password: String,
     pub bio: Option<String>,
     pub image: Option<String>,
     pub created_at: NaiveDateTime,
@@ -44,6 +42,21 @@ impl User {
             .values(&recode)
             .get_result::<User>(conn)?;
 
+        let token = user.gerenate_token()?;
+        Ok((user, token))
+    }
+
+    pub fn authenticate(
+        conn: &mut PgConnection,
+        email: &str,
+        password: &str,
+    ) -> Result<(User, Token), AppError> {
+        let user = users::table
+            .filter(users::email.eq(email))
+            .limit(1)
+            .first::<User>(conn)?;
+
+        hasher::verify(password, &user.password)?;
         let token = user.gerenate_token()?;
         Ok((user, token))
     }
