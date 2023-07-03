@@ -1,6 +1,9 @@
-use actix_web::{web, HttpResponse};
+use actix_web::{web, HttpRequest, HttpResponse};
 
-use crate::{middleware::state::AppState, utils::handler::ApiResponse};
+use crate::{
+    middleware::{auth, state::AppState},
+    utils::handler::ApiResponse,
+};
 
 use super::{model::User, request, response::UserResponse};
 
@@ -27,6 +30,13 @@ pub async fn signin(
 ) -> ApiResponse {
     let conn = &mut state.conn()?;
     let (user, token) = User::authenticate(conn, &form.user.email, &form.user.password)?;
+    let res = UserResponse::from((user, token));
+    Ok(HttpResponse::Ok().json(res))
+}
+
+pub async fn get_user(req: HttpRequest) -> ApiResponse {
+    let user = auth::get_current_user(&req)?;
+    let token = user.gerenate_token()?;
     let res = UserResponse::from((user, token));
     Ok(HttpResponse::Ok().json(res))
 }
