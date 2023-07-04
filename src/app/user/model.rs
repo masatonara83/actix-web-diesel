@@ -24,6 +24,16 @@ pub struct User {
 }
 
 impl User {
+
+    //username検索
+    pub fn find_by_username(conn: &mut PgConnection, username: &str) -> Result<User, AppError> {
+        let user = users::table
+            .filter(users::username.eq(username))
+            .limit(1)
+            .first::<User>(conn)?;
+        Ok(user)
+    }
+
     //Create new User
     pub fn create<'a>(
         conn: &mut PgConnection,

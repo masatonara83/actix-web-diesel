@@ -9,6 +9,7 @@ pub fn api(cfg: &mut ServiceConfig) {
             .route("/users", post().to(signup))
             .route("/users/login", post().to(signin))
             .route("/user", get().to(get_user))
-            .route("/user", put().to(update_user)),
+            .route("/user", put().to(update_user))
+            .route("/profiles/{username}", get().to(get_profile)),
     );
 }
