@@ -61,6 +61,33 @@ impl User {
         Ok((user, token))
     }
 
+    pub fn update(
+        conn: &mut PgConnection,
+        user_id: Uuid,
+        username: Option<String>,
+        email: Option<String>,
+        password: Option<String>,
+        bio: Option<String>,
+        image: Option<String>,
+    ) -> Result<User, AppError> {
+        let password_hash = match password {
+            Some(ref pass) => Some(hasher::hash_password(pass)?),
+            None => None,
+        };
+
+        let target_user = users::table.filter(users::id.eq(user_id));
+        let user = diesel::update(target_user)
+            .set(&UpdateUser {
+                username,
+                email,
+                password: password_hash,
+                bio,
+                image,
+            })
+            .get_result::<User>(conn)?;
+        Ok(user)
+    }
+
     pub fn gerenate_token(&self) -> Result<String, AppError> {
         let now = Utc::now().timestamp_nanos();
         let token = token::encode(self.id, now)?;
@@ -74,4 +101,14 @@ struct SignupUser<'a> {
     username: &'a str,
     email: &'a str,
     password: &'a str,
+}
+
+#[derive(Debug, AsChangeset, Deserialize, Clone)]
+#[diesel(table_name = users)]
+struct UpdateUser {
+    username: Option<String>,
+    email: Option<String>,
+    password: Option<String>,
+    bio: Option<String>,
+    image: Option<String>,
 }

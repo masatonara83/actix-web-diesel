@@ -1,6 +1,6 @@
-use actix_web::web::{get, post, scope, ServiceConfig};
+use actix_web::web::{get, post, put, scope, ServiceConfig};
 
-use crate::app::user::handlers::{get_user, signin, signup};
+use crate::app::user::handlers::{get_user, signin, signup, update_user};
 
 pub fn api(cfg: &mut ServiceConfig) {
     cfg.service(
@@ -8,6 +8,7 @@ pub fn api(cfg: &mut ServiceConfig) {
             // .route("helthcheck", get().to(get_helthcheck))
             .route("/users", post().to(signup))
             .route("/users/login", post().to(signin))
-            .route("/user", get().to(get_user)),
+            .route("/user", get().to(get_user))
+            .route("/user", put().to(update_user)),
     );
 }
