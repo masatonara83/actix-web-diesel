@@ -14,6 +14,13 @@ pub struct Profile {
 
 impl User {
     pub fn get_profile(&self, conn: &mut PgConnection, followee_id: &Uuid) -> Profile {
+        let is_following = Follow::is_following(conn, &self.id, followee_id);
 
+        Profile {
+            username: self.username,
+            bio: self.bio,
+            image: self.image,
+            following: is_following,
+        }
     }
 }
