@@ -1,6 +1,9 @@
 use actix_web::web::{get, post, put, scope, ServiceConfig};
 
-use crate::app::user::handlers::{get_user, signin, signup, update_user};
+use crate::app::{
+    profile::handlers::get_profile,
+    user::handlers::{get_user, signin, signup, update_user},
+};
 
 pub fn api(cfg: &mut ServiceConfig) {
     cfg.service(

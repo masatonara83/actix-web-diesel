@@ -2,7 +2,7 @@ use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::app::user::model::User;
+use crate::app::{follow::model::Follow, user::model::User};
 
 #[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
 pub struct Profile {
@@ -17,9 +17,9 @@ impl User {
         let is_following = Follow::is_following(conn, &self.id, followee_id);
 
         Profile {
-            username: self.username,
-            bio: self.bio,
-            image: self.image,
+            username: self.username.clone(),
+            bio: self.bio.clone(),
+            image: self.image.clone(),
             following: is_following,
         }
     }

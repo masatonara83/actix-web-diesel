@@ -1,6 +1,12 @@
-use actix_web::{web, HttpRequest};
+use actix_web::{web, HttpRequest, HttpResponse};
 
-use crate::{middleware::{state::AppState, auth}, utils::handler::ApiResponse, app::user::model::User};
+use crate::{
+    app::user::model::User,
+    middleware::{auth, state::AppState},
+    utils::handler::ApiResponse,
+};
+
+use super::response::ProfileResponse;
 
 pub type UsernameSlug = String;
 
@@ -10,11 +16,14 @@ pub async fn get_profile(
     path: web::Path<UsernameSlug>,
 ) -> ApiResponse {
     let conn = &mut state.conn()?;
-    let current_user = auth::get_current_user(&req);
+    let current_user = auth::get_current_user(&req)?;
     let username = path.into_inner();
 
     let profile = {
-        let followee = User::find_by_username(conn, &username);
-        
-    }
+        let followee = User::find_by_username(conn, &username)?;
+        current_user.get_profile(conn, &followee.id)
+    };
+
+    let res = ProfileResponse::from(profile);
+    Ok(HttpResponse::Ok().json(res))
 }
