@@ -30,6 +30,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(Logger::default())
             .app_data(actix_web::web::Data::new(state.clone()))
+            .wrap(middleware::cors::cors())
             .configure(routes::api)
     })
     .bind(constants::BIND_ADDRESS)?
