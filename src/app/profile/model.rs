@@ -2,7 +2,8 @@ use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::app::{follow::model::Follow, user::model::User};
+use crate::app::follow::model::Follow;
+use crate::app::user::model::User;
 
 #[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
 pub struct Profile {

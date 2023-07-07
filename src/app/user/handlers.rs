@@ -1,11 +1,11 @@
 use actix_web::{web, HttpRequest, HttpResponse};
 
-use crate::{
-    middleware::{auth, state::AppState},
-    utils::handler::ApiResponse,
-};
+use crate::middleware::{auth, state::AppState};
+use crate::utils::handler::ApiResponse;
 
-use super::{model::User, request, response::UserResponse};
+use super::model::User;
+use super::request;
+use super::response::UserResponse;
 
 //新規登録
 pub async fn signup(

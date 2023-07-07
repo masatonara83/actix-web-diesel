@@ -1,10 +1,8 @@
 use actix_web::{web, HttpRequest, HttpResponse};
 
-use crate::{
-    app::user::model::User,
-    middleware::{auth, state::AppState},
-    utils::handler::ApiResponse,
-};
+use crate::app::user::model::User;
+use crate::middleware::{auth, state::AppState};
+use crate::utils::handler::ApiResponse;
 
 use super::response::ProfileResponse;
 

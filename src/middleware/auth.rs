@@ -14,7 +14,10 @@ use futures::{
 use serde_json::json;
 use uuid::Uuid;
 
-use crate::{app::user::model::User, constants, error::AppError, utils::token};
+use crate::app::user::model::User;
+use crate::constants;
+use crate::error::AppError;
+use crate::utils::token;
 
 use super::state::AppState;
 
