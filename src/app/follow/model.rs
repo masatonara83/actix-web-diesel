@@ -47,6 +47,26 @@ impl Follow {
             following: true,
         })
     }
+
+    pub fn unfollow(
+        conn: &mut PgConnection,
+        follower: &User,
+        followee_id: &Uuid,
+    ) -> Result<Profile, AppError> {
+        diesel::delete(
+            follows::table
+                .filter(follows::follower_id.eq(follower.id))
+                .filter(follows::followee_id.eq(followee_id)),
+        )
+        .execute(conn)?;
+
+        Ok(Profile {
+            username: follower.username.clone(),
+            bio: follower.bio.clone(),
+            image: follower.image.clone(),
+            following: false,
+        })
+    }
 }
 
 #[derive(Insertable)]
