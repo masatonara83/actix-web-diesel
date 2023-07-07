@@ -3,7 +3,9 @@ use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+use crate::app::profile::model::Profile;
 use crate::app::user::model::User;
+use crate::error::AppError;
 use crate::schema::follows;
 
 #[derive(Queryable, Associations, Clone, Serialize, Deserialize)]
@@ -25,4 +27,31 @@ impl Follow {
             .get_result::<Follow>(conn);
         follow.is_ok()
     }
+
+    pub fn follow(
+        conn: &mut PgConnection,
+        follower: &User,
+        followee_id: &Uuid,
+    ) -> Result<Profile, AppError> {
+        diesel::insert_into(follows::table)
+            .values(&CreateFollow {
+                follower_id: follower.id,
+                followee_id: *followee_id,
+            })
+            .execute(conn)?;
+
+        Ok(Profile {
+            username: follower.username.clone(),
+            bio: follower.bio.clone(),
+            image: follower.image.clone(),
+            following: true,
+        })
+    }
+}
+
+#[derive(Insertable)]
+#[diesel(table_name = follows)]
+pub struct CreateFollow {
+    pub follower_id: Uuid,
+    pub followee_id: Uuid,
 }
