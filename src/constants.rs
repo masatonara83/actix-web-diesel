@@ -1,3 +1,5 @@
+pub const AUTH_HEADER: &str = "Authorization";
+
 pub const BIND_ADDRESS: &str = "0.0.0.0:8080";
 
 pub mod env_key {

@@ -1,6 +1,6 @@
 use std::env;
 
-use jsonwebtoken::{errors::Error, EncodingKey, Header};
+use jsonwebtoken::{errors::Error, DecodingKey, EncodingKey, Header, TokenData, Validation};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -20,6 +20,16 @@ pub fn encode(user_id: Uuid, now: i64) -> Result<String, Error> {
         &Header::default(),
         &claims,
         &EncodingKey::from_secret(secret_key),
+    )
+}
+
+pub fn decode(token: &str) -> jsonwebtoken::errors::Result<TokenData<Claims>> {
+    let binding = get_secret_key();
+    let secret_key = binding.as_bytes();
+    jsonwebtoken::decode::<Claims>(
+        token,
+        &DecodingKey::from_secret(secret_key),
+        &Validation::default(),
     )
 }
 

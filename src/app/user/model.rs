@@ -24,6 +24,10 @@ pub struct User {
 }
 
 impl User {
+    pub fn find(conn: &mut PgConnection, user_id: Uuid) -> Result<User, AppError> {
+        let user = users::table.find(user_id).first::<User>(conn)?;
+        Ok(user)
+    }
 
     //username検索
     pub fn find_by_username(conn: &mut PgConnection, username: &str) -> Result<User, AppError> {
