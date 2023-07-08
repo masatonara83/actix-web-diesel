@@ -1,13 +1,14 @@
 use actix_web::web::{delete, get, post, put, scope, ServiceConfig};
 
 use crate::app::follow::handlers::{create_follow, delete_follow};
+use crate::app::healthcheck::handler::get_healthcheck;
 use crate::app::profile::handlers::get_profile;
 use crate::app::user::handlers::{get_user, signin, signup, update_user};
 
 pub fn api(cfg: &mut ServiceConfig) {
     cfg.service(
         scope("/api")
-            // .route("helthcheck", get().to(get_helthcheck))
+            .route("/healthcheck", get().to(get_healthcheck))
             .route("/users", post().to(signup))
             .route("/users/login", post().to(signin))
             .route("/user", get().to(get_user))

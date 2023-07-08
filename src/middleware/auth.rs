@@ -67,7 +67,7 @@ const TOKEN_IDENTIFIER: &str = "Token";
 //トークン認証を行わないエンドポイント
 const SKIP_AUTH_ROUTE: [SkipAuthRoute; 6] = [
     SkipAuthRoute {
-        path: "/api/helthcheck",
+        path: "/api/healthcheck",
         method: Method::GET,
     },
     SkipAuthRoute {
