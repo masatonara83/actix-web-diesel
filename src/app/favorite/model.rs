@@ -48,4 +48,18 @@ impl Favorite {
             .first::<i64>(conn)?;
         Ok(count)
     }
+
+    pub fn is_favorited_article_by_user_id(
+        conn: &mut PgConnection,
+        article_id: &Uuid,
+        user_id: &Uuid,
+    ) -> Result<bool, AppError> {
+        let count = favorites::table
+            .filter(favorites::article_id.eq(article_id))
+            .filter(favorites::user_id.eq(user_id))
+            .select(diesel::dsl::count(favorites::id))
+            .first::<i64>(conn)?;
+        let is_favorited = count > 0;
+        Ok(is_favorited)
+    }
 }

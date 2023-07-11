@@ -1,6 +1,9 @@
+use crate::app::favorite::service::fetch_favorite_info;
+use crate::app::tag::model::CreateTag;
 use crate::diesel::BelongingToDsl;
 use crate::diesel::GroupedBy;
 use diesel::{ExpressionMethods, PgConnection, QueryDsl, RunQueryDsl};
+use uuid::Uuid;
 
 use crate::{
     app::{
@@ -14,6 +17,7 @@ use crate::{
 };
 
 use super::model::Article;
+use super::model::CreateArticle;
 
 pub struct FetchArticlesList {
     pub tag: Option<String>,
@@ -130,4 +134,53 @@ pub fn fetch_articles_list(
         .collect::<Vec<_>>();
 
     Ok((articles_list, articles_count))
+}
+
+pub struct CreateArticleService {
+    pub current_user: User,
+    pub title: String,
+    pub description: String,
+    pub body: String,
+    pub tag_name_list: Option<Vec<String>>,
+}
+
+pub fn create_article(
+    conn: &mut PgConnection,
+    params: &CreateArticleService,
+) -> Result<(Article, Profile, FavoriteInfo, Vec<Tag>), AppError> {
+    let title_slug = Article::convert_title_to_slug(&params.title);
+
+    let article = Article::create(
+        conn,
+        &CreateArticle {
+            author_id: params.current_user.id,
+            slug: title_slug,
+            title: params.title.clone(),
+            description: params.description.clone(),
+            body: params.body.clone(),
+        },
+    )?;
+
+    let tags_list = create_tags_list(conn, &article.id, &params.tag_name_list)?;
+    let profile = params.current_user.get_profile(conn, &article.author_id);
+    let favorite_info = fetch_favorite_info(conn, &article.id, &article.author_id)?;
+    Ok((article, profile, favorite_info, tags_list))
+}
+
+fn create_tags_list(
+    conn: &mut PgConnection,
+    article_id: &Uuid,
+    tag_name_list: &Option<Vec<String>>,
+) -> Result<Vec<Tag>, AppError> {
+    let list = tag_name_list
+        .as_ref()
+        .map(|tag_name_list| {
+            let records = tag_name_list
+                .iter()
+                .map(|name| CreateTag { name, article_id })
+                .collect();
+            Tag::create_tags(conn, records)
+        })
+        .unwrap_or_else(|| Ok(vec![]));
+    list
 }

@@ -30,4 +30,21 @@ impl Tag {
             .get_results::<Uuid>(conn)?;
         Ok(tag_ids)
     }
+
+    pub fn create_tags(
+        conn: &mut PgConnection,
+        records: Vec<CreateTag>,
+    ) -> Result<Vec<Self>, AppError> {
+        let new_tags = diesel::insert_into(tags::table)
+            .values(records)
+            .get_results::<Self>(conn)?;
+        Ok(new_tags)
+    }
+}
+
+#[derive(Insertable)]
+#[diesel(table_name = tags)]
+pub struct CreateTag<'a> {
+    pub article_id: &'a Uuid,
+    pub name: &'a String,
 }

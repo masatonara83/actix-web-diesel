@@ -7,6 +7,21 @@ use crate::{
 
 use super::model::Article;
 
+#[derive(Deserialize, Serialize)]
+pub struct SingleArticleResponse {
+    pub article: ArticleContent,
+}
+
+impl From<(Article, Profile, FavoriteInfo, Vec<Tag>)> for SingleArticleResponse {
+    fn from(
+        (article, profile, favorite_info, tags): (Article, Profile, FavoriteInfo, Vec<Tag>),
+    ) -> Self {
+        Self {
+            article: ArticleContent::from((article, profile, &favorite_info, tags)),
+        }
+    }
+}
+
 type ArticleCount = i64;
 
 #[derive(Deserialize, Serialize)]
