@@ -9,6 +9,12 @@ pub struct ArticleListQueryParameter {
     pub offset: Option<i64>,
 }
 
+#[derive(Deserialize)]
+pub struct FeedQueryParameter {
+    pub limit: Option<i64>,
+    pub offset: Option<i64>,
+}
+
 #[derive(Deserialize, Serialize)]
 pub struct CreateArticleRequest {
     pub article: CreateArticleInner,
@@ -21,4 +27,17 @@ pub struct CreateArticleInner {
     pub description: String,
     pub body: String,
     pub tags_list: Option<Vec<String>>,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct UpdateArticleRequest {
+    pub article: UpdateArticleInner,
+}
+
+#[derive(Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateArticleInner {
+    pub title: Option<String>,
+    pub description: Option<String>,
+    pub body: Option<String>,
 }

@@ -43,12 +43,62 @@ impl Article {
         Ok(ids)
     }
 
+    pub fn find_by_slug_and_author_id(
+        conn: &mut PgConnection,
+        slug: &str,
+        author_id: &Uuid,
+    ) -> Result<Self, AppError> {
+        let item = articles::table
+            .filter(articles::slug.eq(slug))
+            .filter(articles::author_id.eq(author_id))
+            .first::<Self>(conn)?;
+        Ok(item)
+    }
+
+    pub fn find_by_slug_with_author(
+        conn: &mut PgConnection,
+        slug: &str,
+    ) -> Result<(Self, User), AppError> {
+        let result = articles::table
+            .inner_join(users::table)
+            .filter(articles::slug.eq(slug))
+            .get_result::<(Self, User)>(conn)?;
+        Ok(result)
+    }
+
     pub fn create(conn: &mut PgConnection, recode: &CreateArticle) -> Result<Self, AppError> {
         let article = diesel::insert_into(articles::table)
             .values(recode)
             .get_result::<Article>(conn)?;
 
         Ok(article)
+    }
+
+    pub fn update(
+        conn: &mut PgConnection,
+        slug: &str,
+        author_id: &Uuid,
+        record: &UpdateArticle,
+    ) -> Result<Self, AppError> {
+        let article = diesel::update(
+            articles::table
+                .filter(articles::slug.eq(slug))
+                .filter(articles::author_id.eq(author_id)),
+        )
+        .set(record)
+        .get_result::<Article>(conn)?;
+
+        Ok(article)
+    }
+
+    pub fn delete(conn: &mut PgConnection, slug: &str, author_id: &Uuid) -> Result<(), AppError> {
+        diesel::delete(
+            articles::table
+                .filter(articles::slug.eq(slug))
+                .filter(articles::author_id.eq(author_id)),
+        )
+        .execute(conn)?;
+        Ok(())
     }
 }
 
@@ -60,4 +110,13 @@ pub struct CreateArticle {
     pub title: String,
     pub description: String,
     pub body: String,
+}
+
+#[derive(AsChangeset)]
+#[diesel(table_name = articles)]
+pub struct UpdateArticle {
+    pub slug: Option<String>,
+    pub title: Option<String>,
+    pub description: Option<String>,
+    pub body: Option<String>,
 }

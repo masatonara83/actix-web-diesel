@@ -40,6 +40,16 @@ impl Tag {
             .get_results::<Self>(conn)?;
         Ok(new_tags)
     }
+
+    pub fn find_tags_by_article_id(
+        conn: &mut PgConnection,
+        article_id: &Uuid,
+    ) -> Result<Vec<Self>, AppError> {
+        let tags = tags::table
+            .filter(tags::article_id.eq(article_id))
+            .get_results::<Self>(conn)?;
+        Ok(tags)
+    }
 }
 
 #[derive(Insertable)]

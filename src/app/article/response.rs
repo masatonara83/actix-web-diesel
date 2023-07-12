@@ -26,7 +26,7 @@ type ArticleCount = i64;
 
 #[derive(Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct MultipleArticleResponse {
+pub struct MultipleArticlesResponse {
     pub articles: Vec<ArticleContent>,
     pub articles_count: ArticleCount,
 }
@@ -36,7 +36,7 @@ type Inner = ((Article, Profile, FavoriteInfo), Vec<Tag>);
 type ArticlesList = Vec<Inner>;
 type Item = (ArticlesList, ArticlesCount);
 
-impl From<Item> for MultipleArticleResponse {
+impl From<Item> for MultipleArticlesResponse {
     fn from((list, articles_count): (Vec<Inner>, ArticleCount)) -> Self {
         let articles = list
             .iter()
