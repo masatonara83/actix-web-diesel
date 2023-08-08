@@ -4,6 +4,7 @@ use crate::app::article::handlers::{
     create_article, delete_article, get_article_by_slug, get_articles, get_articles_feed,
     update_article,
 };
+use crate::app::comment::handlers::get_article_comments;
 use crate::app::follow::handlers::{create_follow, delete_follow};
 use crate::app::healthcheck::handler::get_healthcheck;
 use crate::app::profile::handlers::get_profile;
@@ -25,6 +26,7 @@ pub fn api(cfg: &mut ServiceConfig) {
             .route("/articles/feed", get().to(get_articles_feed))
             .route("/articles/{slug}", get().to(get_article_by_slug))
             .route("/articles/{slug}", put().to(update_article))
-            .route("/articles/{slug}", delete().to(delete_article)),
+            .route("/articles/{slug}", delete().to(delete_article))
+            .route("/articles/{slug}/comments", get().to(get_article_comments)),
     );
 }
